@@ -6,6 +6,13 @@
 
 export LC_ALL=C.UTF-8
 
+apt install software-properties-common wget -y
+dpkg --add-architecture i386
+wget -nc https://dl.winehq.org/wine-builds/winehq.key
+apt-key add winehq.key
+add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main'
+apt install --no-install-recommends  winehq-stable
+
 for b_name in {"${BASE_OUTDIR}/bin"/*,src/secp256k1/*tests,src/univalue/{no_nul,test_json,unitester,object}}.exe; do
     # shellcheck disable=SC2044
     for b in $(find "${BASE_ROOT_DIR}" -executable -type f -name "$(basename $b_name)"); do
@@ -13,7 +20,7 @@ for b_name in {"${BASE_OUTDIR}/bin"/*,src/secp256k1/*tests,src/univalue/{no_nul,
         echo "Wrap $b ..."
         mv "$b" "${b}_orig"
         echo '#!/usr/bin/env bash' > "$b"
-        echo "wine64 \"${b}_orig\" \"\$@\"" >> "$b"
+        echo "wine \"${b}_orig\" \"\$@\"" >> "$b"
         chmod +x "$b"
       fi
     done
